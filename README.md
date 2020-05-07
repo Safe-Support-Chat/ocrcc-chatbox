@@ -13,8 +13,8 @@ Built on:
 <script src="https://unpkg.com/safesupport-chatbox" type="text/javascript"></script>
 <script>
   var config = {
-    matrixServerUrl: 'https://matrix.rhok.space',
-    botId: '@help-bot:rhok.space',
+    matrixServerUrl: 'https://matrix-client.matrix.org',
+    botId: '@your-help-bot:matrix.org',
     roomName: 'Support Chat',
     termsUrl: 'https://tosdr.org/',
     introMessage: 'This chat application does not collect any of your personal data or any data from your use of this service.',
@@ -31,8 +31,8 @@ Built on:
 Options:
 | Name | Description | Default
 | ----------- | ----------- | --------- |
-| `matrixServerUrl` (required) | URL for the Matrix homeserver you want to connect to | `https://matrix.rhok.space` |
-| `botId` (required) | User ID for the bot account that handles invites | `@help-bot:rhok.space` |
+| `matrixServerUrl` (required) | URL for the Matrix homeserver you want to connect to | `https://matrix-client.matrix.org` |
+| `botId` (required) | User ID for the bot account that handles invites | null |
 | `introMessage` (optional) | First message the user sees before agreeing to the Terms of Use | `This chat application does not collect any of your personal data or any data from your use of this service.` |
 | `termsUrl` (optional) | URL for the Terms of Use for the chat service | `https://tosdr.org/` |
 | `roomName` (optional)  | Name of the chatroom generated in Riot | 'Support Chat' |

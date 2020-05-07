@@ -3,6 +3,7 @@ const increaseSpecificity = require('postcss-increase-specificity');
 const autoprefixer = require('autoprefixer');
 const CopyPlugin = require('copy-webpack-plugin');
 const path = require('path');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const devMode = process.env.NODE_ENV !== 'production';
 
@@ -26,7 +27,8 @@ const defaultConfig = {
     new CopyPlugin([
       { from: 'public', to: '.' },
     ]),
-  ],
+    ( devMode ? new BundleAnalyzerPlugin() : null )
+  ].map(i => i),
   module: {
     rules: [
       {
