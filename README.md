@@ -10,7 +10,7 @@ Built on:
 
 ## Usage
 ```
-<script src="https://unpkg.com/safesupport-chatbox" type="text/javascript"></script>
+<script src="https://unpkg.com/private-safesupport-chatbox" type="text/javascript"></script>
 <script>
   var config = {
     matrixServerUrl: 'https://matrix-client.matrix.org',
