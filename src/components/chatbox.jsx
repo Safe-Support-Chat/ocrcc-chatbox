@@ -604,7 +604,7 @@ class ChatBox extends React.Component {
           {(status) => {
             return (
             <div className={`widget widget-${status}`} aria-hidden={!opened}>
-              <div id="ocrcc-chatbox" aria-haspopup="dialog">
+              <div id="safesupport-chatbox" aria-haspopup="dialog">
                 <Header handleToggleOpen={this.handleToggleOpen} opened={opened} handleExitChat={this.handleExitChat} />
 
                 <div className="message-window" ref={this.messageWindow}>

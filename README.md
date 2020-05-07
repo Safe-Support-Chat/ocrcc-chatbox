@@ -2,7 +2,7 @@
 
 ![Demo video of chatbox](https://media.giphy.com/media/IhmtP0NoG22k6FRQDF/giphy.gif)
 
-Live demo: https://nomadic-labs.github.io/ocrcc-chatbox/
+Live demo: https://nomadic-labs.github.io/safesupport-chatbox/
 
 Built on:
 - [Embeddable React Widget](https://github.com/seriousben/embeddable-react-widget)
@@ -68,23 +68,23 @@ This chatbox is meant to be used with a bot account that handles a number of fun
 
 The bot account is invited to the chatroom when a support request is initiated.
 
-You can find the code for the bot at [ocrcc-bot](https://github.com/nomadic-labs/ocrcc-bot).
+You can find the code for the bot at [safesupport-bot](https://github.com/nomadic-labs/safesupport-bot).
 
 ## Bookmarklet
 
 The bookmarklet is a special link that runs a script on any website. The user saves the link by dragging it to their bookmarks bar. Then they can click on the bookmark on any page to run the script and load the chatbox.
 
-You can try this out on the [live demo](https://nomadic-labs.github.io/ocrcc-chatbox/).
+You can try this out on the [live demo](https://nomadic-labs.github.io/safesupport-chatbox/).
 
 ## Local development
 
 Clone the project:
 ```
-git clone https://github.com/nomadic-labs/ocrcc-chatbox.git
+git clone https://github.com/nomadic-labs/safesupport-chatbox.git
 ```
 Install the dependencies:
 ```
-cd ocrcc-chatbox
+cd safesupport-chatbox
 yarn
 ```
 

@@ -227,7 +227,7 @@
 
 }
 
-#ocrcc-chatbox {
+#safesupport-chatbox {
   font-family: $theme-font;
   display: flex;
   flex-direction: column;
@@ -532,13 +532,13 @@
     padding: 5px;
   }
 
-  #ocrcc-chatbox {
+  #safesupport-chatbox {
     height: calc(180px + 60vh);
   }
 }
 
 @media screen and (max-width: 360px){
-  #ocrcc-chatbox .input-window .message-input-container .emoji-picker {
+  #safesupport-chatbox .input-window .message-input-container .emoji-picker {
     position: fixed;
     left: 5px;
     right: 5px;
