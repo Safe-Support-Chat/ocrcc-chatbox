@@ -146,23 +146,24 @@ class ChatBox extends React.Component {
   }
 
   exitChat = async (resetState=true) => {
-    if (!this.state.client) return null;
+    if (this.state.client) {
+      await this.state.client.leave(this.state.roomId)
 
-    await this.state.client.leave(this.state.roomId)
+      const auth = {
+        type: 'm.login.password',
+        user: this.state.userId,
+        identifier: {
+            type: "m.id.user",
+            user: this.state.userId,
+        },
+        password: this.state.password,
+      };
 
-    const auth = {
-      type: 'm.login.password',
-      user: this.state.userId,
-      identifier: {
-          type: "m.id.user",
-          user: this.state.userId,
-      },
-      password: this.state.password,
-    };
-
-    await this.state.client.deactivateAccount(auth, true)
-    await this.state.client.stopClient()
-    await this.state.client.clearStores()
+      await this.state.client.deactivateAccount(auth, true)
+      await this.state.client.stopClient()
+      await this.state.client.clearStores()
+      this.setState({ client: null })
+    }
 
     this.state.localStorage.clear()
 
@@ -296,19 +297,7 @@ class ChatBox extends React.Component {
   }
 
   handleDecryptionError = async (event, err) => {
-    console.log("Decryption error", err)
-    console.log("Event", event)
-    // if (this.state.client) {
-    //   const isCryptoEnabled = await this.state.client.isCryptoEnabled()
-    //   const isRoomEncrypted = this.state.client.isRoomEncrypted(this.state.roomId)
-
-    //   if (!isCryptoEnabled || !isRoomEncrypted) {
-    //     return this.initializeUnencryptedChat()
-    //   }
-    // }
-
     const eventId = event.getId()
-    // this.displayFakeMessage({ body: '** Unable to decrypt message **' }, event.getSender(), eventId)
     this.handleMessageEvent(event)
     this.setState({ decryptionErrors: { [eventId]: true }})
   }
@@ -418,15 +407,8 @@ class ChatBox extends React.Component {
       roomId: event.getRoomId(),
       content: event.getContent(),
     }
-
-    console.log("==========> event", event)
-    console.log("==========> message", message)
-    console.log("==========>clear content", event.getClearContent())
-
-    const isOfflineNotice = message.content.msgtype === "m.notice" && message.content.body === CHAT_IS_OFFLINE_NOTICE
-    if (isOfflineNotice) {
-      return this.handleChatOffline(event.getRoomId())
-    }
+    // there's also event.getClearContent() which only works on encrypted messages
+    // but not really sure when it should be used vs event.getContent()
 
     if (message.content.showToUser && message.content.showToUser !== this.state.userId) {
       return;
@@ -449,21 +431,37 @@ class ChatBox extends React.Component {
     const decryptionErrors = {...this.state.decryptionErrors}
     delete decryptionErrors[message.id]
     const existingMessageIndex = messages.findIndex(({ id }) => id === message.id)
+    const isOfflineNotice = message.content.msgtype === "m.notice" && message.content.body === CHAT_IS_OFFLINE_NOTICE
+
+    let newMessage = message
+
+    // when the bot sends a notice that the chat is offline
+    // replace the message with the client-configured message
+    // for now we're treating m.notice and m.text messages the same
+    if (isOfflineNotice) {
+      newMessage = {
+        ...message,
+        content: {
+          ...message.content,
+          body: this.props.chatOfflineMessage
+        }
+      }
+      this.handleChatOffline(event.getRoomId())
+    }
 
     if (existingMessageIndex > -1) {
-      messages.splice(existingMessageIndex, 1, message)
+      messages.splice(existingMessageIndex, 1, newMessage)
     } else {
-      messages.push(message)
+      messages.push(newMessage)
     }
 
     this.setState({ messages, decryptionErrors })
   }
 
   handleChatOffline = (roomId) => {
-    this.displayBotMessage({ body: this.props.chatOfflineMessage }, roomId)
-    this.exitChat(false) // close the chat but keep state
+    this.exitChat(false) // close the chat connection but keep chatbox state
     window.clearInterval(this.state.timeoutId) // no more waiting messages
-    this.setState({ ready: true })
+    this.setState({ ready: true }) // no more loading animation
   }
 
   handleKeyDown = (e) => {
@@ -591,7 +589,7 @@ class ChatBox extends React.Component {
     const message = this.state.inputValue
     if (!Boolean(message)) return null;
 
-    if (this.state.isCryptoEnabled && !(this.state.client.isRoomEncrypted(this.state.roomId) && this.state.client.isCryptoEnabled())) return null;
+    if (this.state.isCryptoEnabled && this.state.client && !(this.state.client.isRoomEncrypted(this.state.roomId) && this.state.client.isCryptoEnabled())) return null;
 
     if (this.state.client && this.state.roomId) {
       const messagesInFlight = [...this.state.messagesInFlight]
