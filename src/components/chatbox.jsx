@@ -25,7 +25,7 @@ const ENCRYPTION_NOTICE = "Messages in this chat are secured with end-to-end enc
 const UNENCRYPTION_NOTICE = "Messages in this chat are not encrypted."
 const RESTARTING_UNENCRYPTED_CHAT_MESSAGE = "Restarting chat without encryption."
 const WAIT_TIME_MS = 120000 // 2 minutes
-const CHAT_IS_OFFLINE_NOTICE = "Chat is offline"
+const CHAT_IS_OFFLINE_NOTICE = "CHAT_OFFLINE"
 
 const DEFAULT_MATRIX_SERVER = "https://matrix.rhok.space/"
 const DEFAULT_BOT_ID = "@help-bot:rhok.space"
@@ -37,6 +37,7 @@ const DEFAULT_CONFIRMATION_MESSAGE = "Waiting for a facilitator to join the chat
 const DEFAULT_EXIT_MESSAGE = "The chat is closed. You may close this window."
 const DEFAULT_ANONYMOUS_DISPLAY_NAME="Anonymous"
 const DEFAULT_CHAT_UNAVAILABLE_MESSAGE = "The chat service is not available right now. Please try again later."
+const DFAULT_CHAT_OFFLINE_MESSAGE = "There are no facilitators currently available. For immediate service, please call 123-456-7890."
 const DEFAULT_WAIT_MESSAGE = "Please be patient, our online facilitators are currently responding to other support requests."
 
 
@@ -144,7 +145,7 @@ class ChatBox extends React.Component {
     }
   }
 
-  exitChat = async () => {
+  exitChat = async (resetState=true) => {
     if (!this.state.client) return null;
 
     await this.state.client.leave(this.state.roomId)
@@ -164,7 +165,10 @@ class ChatBox extends React.Component {
     await this.state.client.clearStores()
 
     this.state.localStorage.clear()
-    this.setState(this.initialState)
+
+    if (resetState) {
+      this.setState(this.initialState)
+    }
   }
 
   createLocalStorage = async (deviceId, sessionId) => {
@@ -292,17 +296,20 @@ class ChatBox extends React.Component {
   }
 
   handleDecryptionError = async (event, err) => {
-    if (this.state.client) {
-      const isCryptoEnabled = await this.state.client.isCryptoEnabled()
-      const isRoomEncrypted = this.state.client.isRoomEncrypted(this.state.roomId)
+    console.log("Decryption error", err)
+    console.log("Event", event)
+    // if (this.state.client) {
+    //   const isCryptoEnabled = await this.state.client.isCryptoEnabled()
+    //   const isRoomEncrypted = this.state.client.isRoomEncrypted(this.state.roomId)
 
-      if (!isCryptoEnabled || !isRoomEncrypted) {
-        return this.initializeUnencryptedChat()
-      }
-    }
+    //   if (!isCryptoEnabled || !isRoomEncrypted) {
+    //     return this.initializeUnencryptedChat()
+    //   }
+    // }
 
     const eventId = event.getId()
-    this.displayFakeMessage({ body: '** Unable to decrypt message **' }, event.getSender(), eventId)
+    // this.displayFakeMessage({ body: '** Unable to decrypt message **' }, event.getSender(), eventId)
+    this.handleMessageEvent(event)
     this.setState({ decryptionErrors: { [eventId]: true }})
   }
 
@@ -412,6 +419,15 @@ class ChatBox extends React.Component {
       content: event.getContent(),
     }
 
+    console.log("==========> event", event)
+    console.log("==========> message", message)
+    console.log("==========>clear content", event.getClearContent())
+
+    const isOfflineNotice = message.content.msgtype === "m.notice" && message.content.body === CHAT_IS_OFFLINE_NOTICE
+    if (isOfflineNotice) {
+      return this.handleChatOffline(event.getRoomId())
+    }
+
     if (message.content.showToUser && message.content.showToUser !== this.state.userId) {
       return;
     }
@@ -443,6 +459,12 @@ class ChatBox extends React.Component {
     this.setState({ messages, decryptionErrors })
   }
 
+  handleChatOffline = (roomId) => {
+    this.displayBotMessage({ body: this.props.chatOfflineMessage }, roomId)
+    this.exitChat(false) // close the chat but keep state
+    window.clearInterval(this.state.timeoutId) // no more waiting messages
+    this.setState({ ready: true })
+  }
 
   handleKeyDown = (e) => {
     switch (e.keyCode) {
@@ -492,12 +514,6 @@ class ChatBox extends React.Component {
         return this.handleDecryptionError(event, err)
       }
       if (event.getType() === "m.room.message") {
-        const content = event.getContent()
-
-        if (content.msgtype === "m.notice" && content.body === CHAT_IS_OFFLINE_NOTICE) {
-          this.setState({ ready: true })
-          return window.clearInterval(this.state.timeoutId)
-        }
         this.handleMessageEvent(event)
       }
     });
@@ -557,7 +573,7 @@ class ChatBox extends React.Component {
 
   startWaitTimeForFacilitator = () => {
     const timeoutId = window.setInterval(() => {
-      if (!this.state.facilitatorId) {
+      if (!this.state.facilitatorId && !this.state.ready) {
         this.displayBotMessage({ body: this.props.waitMessage })
       }
     }, WAIT_TIME_MS)
@@ -715,6 +731,7 @@ ChatBox.propTypes = {
   chatUnavailableMessage: PropTypes.string,
   anonymousDisplayName: PropTypes.string,
   waitMessage: PropTypes.string,
+  chatOfflineMessage: PropTypes.string,
 }
 
 ChatBox.defaultProps = {
@@ -729,6 +746,7 @@ ChatBox.defaultProps = {
   anonymousDisplayName: DEFAULT_ANONYMOUS_DISPLAY_NAME,
   chatUnavailableMessage: DEFAULT_CHAT_UNAVAILABLE_MESSAGE,
   waitMessage: DEFAULT_WAIT_MESSAGE,
+  chatOfflineMessage: DFAULT_CHAT_OFFLINE_MESSAGE
 }
 
 export default ChatBox;
