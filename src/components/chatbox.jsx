@@ -53,7 +53,7 @@ class ChatBox extends React.Component {
       userId: null,
       password: null,
       localStorage: null,
-      messages: [],
+      messages: {},
       inputValue: "",
       errors: [],
       roomId: null,
@@ -372,31 +372,39 @@ class ChatBox extends React.Component {
   }
 
   displayFakeMessage = (content, sender, messageId=uuid()) => {
-    const msgList = [...this.state.messages]
     const msg = {
       id: messageId,
       type: 'm.room.message',
       sender: sender,
       roomId: this.state.roomId,
       content: content,
+      timestamp: Date.now(),
     }
-    msgList.push(msg)
 
-    this.setState({ messages: msgList })
+    this.setState({
+      messages: {
+        ...this.state.messages,
+        [messageId]: msg
+      }
+    })
   }
 
-  displayBotMessage = (content, roomId) => {
-    const msgList = [...this.state.messages]
+  displayBotMessage = (content, roomId, messageId=uuid()) => {
     const msg = {
-      id: uuid(),
+      id: messageId,
       type: 'm.room.message',
       sender: this.props.botId,
       roomId: roomId || this.state.roomId,
       content: content,
+      timestamp: Date.now(),
     }
-    msgList.push(msg)
 
-    this.setState({ messages: msgList })
+    this.setState({
+      messages: {
+        ...this.state.messages,
+        [messageId]: msg
+      }
+    })
   }
 
   handleMessageEvent = event => {
@@ -406,7 +414,9 @@ class ChatBox extends React.Component {
       sender: event.getSender(),
       roomId: event.getRoomId(),
       content: event.getContent(),
+      timestamp: event.getTs(),
     }
+
     // there's also event.getClearContent() which only works on encrypted messages
     // but not really sure when it should be used vs event.getContent()
 
@@ -425,12 +435,9 @@ class ChatBox extends React.Component {
       this.setState({ messagesInFlight })
     }
 
-    // check for decryption error message and replace with decrypted message
-    // or push message to messages array
-    const messages = [...this.state.messages]
     const decryptionErrors = {...this.state.decryptionErrors}
     delete decryptionErrors[message.id]
-    const existingMessageIndex = messages.findIndex(({ id }) => id === message.id)
+
     const isOfflineNotice = message.content.msgtype === "m.notice" && message.content.body === CHAT_IS_OFFLINE_NOTICE
 
     let newMessage = message
@@ -449,13 +456,13 @@ class ChatBox extends React.Component {
       this.handleChatOffline(event.getRoomId())
     }
 
-    if (existingMessageIndex > -1) {
-      messages.splice(existingMessageIndex, 1, newMessage)
-    } else {
-      messages.push(newMessage)
-    }
-
-    this.setState({ messages, decryptionErrors })
+    this.setState({
+      messages: {
+        ...this.state.messages,
+        [message.id]: newMessage,
+      },
+      decryptionErrors
+    })
   }
 
   handleChatOffline = (roomId) => {
@@ -527,7 +534,7 @@ class ChatBox extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState.messages.length !== this.state.messages.length) {
+    if ((prevState.messages !== this.state.messages) || (prevState.messagesInFlight !== this.state.messagesInFlight) || (prevState.typingStatus !== this.state.typingStatus)) {
       if (this.messageWindow.current.scrollTo) {
         this.messageWindow.current.scrollTo(0, this.messageWindow.current.scrollHeight)
       }
@@ -610,6 +617,7 @@ class ChatBox extends React.Component {
 
   render() {
     const { ready, messages, messagesInFlight, inputValue, userId, roomId, typingStatus, opened, showDock, emojiSelectorOpen, isMobile, decryptionErrors } = this.state;
+    const orderedMessages = Object.values(messages).sort((a,b) => a.timestamp - b.timestamp)
     const inputLabel = 'Send a message...'
 
     return (
@@ -645,7 +653,7 @@ class ChatBox extends React.Component {
                       </div>
 
                       {
-                        messages.map((message, index) => {
+                        orderedMessages.map((message, index) => {
                           return(
                             <Message key={message.id} message={message} userId={userId} botId={this.props.botId} client={this.state.client} />
                           )
