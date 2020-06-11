@@ -37,8 +37,9 @@ const DEFAULT_CONFIRMATION_MESSAGE = "Waiting for a facilitator to join the chat
 const DEFAULT_EXIT_MESSAGE = "The chat is closed. You may close this window."
 const DEFAULT_ANONYMOUS_DISPLAY_NAME="Anonymous"
 const DEFAULT_CHAT_UNAVAILABLE_MESSAGE = "The chat service is not available right now. Please try again later."
-const DFAULT_CHAT_OFFLINE_MESSAGE = "There are no facilitators currently available. For immediate service, please call 123-456-7890."
+const DEFAULT_CHAT_OFFLINE_MESSAGE = "There are no facilitators currently available. For immediate service, please call 123-456-7890."
 const DEFAULT_WAIT_MESSAGE = "Please be patient, our online facilitators are currently responding to other support requests."
+const DEFAULT_ENCRYPTION_DISABLED = true
 
 
 class ChatBox extends React.Component {
@@ -237,14 +238,14 @@ class ChatBox extends React.Component {
     try {
       await client.initCrypto()
     } catch(err) {
-      return this.initializeUnencryptedChat()
+      return this.restartWithoutCrypto()
     }
 
     await client.startClient()
     await this.createRoom(client)
   }
 
-  initializeUnencryptedChat = async () => {
+  restartWithoutCrypto = async () => {
     if (this.state.client) {
       this.state.client.leave(this.state.roomId)
       this.state.client.stopClient()
@@ -287,7 +288,21 @@ class ChatBox extends React.Component {
       console.log("error", err)
       this.handleInitError(err)
     }
+  }
 
+
+  initializeUnencryptedChat = async () => {
+    this.setState({ ready: false })
+
+    const client = await this.createClientWithAccount()
+    this.setState({
+      client: client
+    })
+    client.setDisplayName(this.props.anonymousDisplayName)
+    this.setMatrixListeners(client)
+
+    await client.startClient()
+    await this.createRoom(client)
   }
 
   handleInitError = (err) => {
@@ -570,7 +585,11 @@ class ChatBox extends React.Component {
     this.setState({ awaitingAgreement: false })
     this.startWaitTimeForFacilitator()
     try {
-      this.initializeChat()
+      if (this.props.isEncryptionDisabled) {
+        this.initializeUnencryptedChat()
+      } else {
+        this.initializeChat()
+      }
     } catch(err) {
       this.handleInitError(err)
     }
@@ -678,7 +697,7 @@ class ChatBox extends React.Component {
                         <div className={`message from-bot`}>
                           <div className="text buttons">
                             {`Restart chat without encryption?`}
-                            <button className="btn" id="accept" onClick={this.initializeUnencryptedChat}>RESTART</button>
+                            <button className="btn" id="accept" onClick={this.restartWithoutCrypto}>RESTART</button>
                           </div>
                         </div>
                       }
@@ -738,6 +757,7 @@ ChatBox.propTypes = {
   anonymousDisplayName: PropTypes.string,
   waitMessage: PropTypes.string,
   chatOfflineMessage: PropTypes.string,
+  isEncryptionDisabled: PropTypes.bool,
 }
 
 ChatBox.defaultProps = {
@@ -752,7 +772,8 @@ ChatBox.defaultProps = {
   anonymousDisplayName: DEFAULT_ANONYMOUS_DISPLAY_NAME,
   chatUnavailableMessage: DEFAULT_CHAT_UNAVAILABLE_MESSAGE,
   waitMessage: DEFAULT_WAIT_MESSAGE,
-  chatOfflineMessage: DFAULT_CHAT_OFFLINE_MESSAGE
+  chatOfflineMessage: DEFAULT_CHAT_OFFLINE_MESSAGE,
+  isEncryptionDisabled: DEFAULT_ENCRYPTION_DISABLED
 }
 
 export default ChatBox;
