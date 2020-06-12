@@ -37,7 +37,7 @@ const DEFAULT_CONFIRMATION_MESSAGE = "Waiting for a facilitator to join the chat
 const DEFAULT_EXIT_MESSAGE = "The chat is closed. You may close this window."
 const DEFAULT_ANONYMOUS_DISPLAY_NAME="Anonymous"
 const DEFAULT_CHAT_UNAVAILABLE_MESSAGE = "The chat service is not available right now. Please try again later."
-const DEFAULT_CHAT_OFFLINE_MESSAGE = "There are no facilitators currently available. For immediate service, please call 123-456-7890."
+const DEFAULT_CHAT_OFFLINE_MESSAGE = "All of the chat facilitators are currently offline."
 const DEFAULT_WAIT_MESSAGE = "Please be patient, our online facilitators are currently responding to other support requests."
 const DEFAULT_ENCRYPTION_DISABLED = false
 
