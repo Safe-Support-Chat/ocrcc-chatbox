@@ -40,6 +40,8 @@ const DEFAULT_CHAT_UNAVAILABLE_MESSAGE = "The chat service is not available righ
 const DEFAULT_CHAT_OFFLINE_MESSAGE = "All of the chat facilitators are currently offline."
 const DEFAULT_WAIT_MESSAGE = "Please be patient, our online facilitators are currently responding to other support requests."
 const DEFAULT_ENCRYPTION_DISABLED = false
+const DEFAULT_POSITION = 'bottom right'
+const DEFAULT_SIZE = 'large'
 
 
 class ChatBox extends React.Component {
@@ -638,14 +640,15 @@ class ChatBox extends React.Component {
     const { ready, messages, messagesInFlight, inputValue, userId, roomId, typingStatus, opened, showDock, emojiSelectorOpen, isMobile, decryptionErrors } = this.state;
     const orderedMessages = Object.values(messages).sort((a,b) => a.timestamp - b.timestamp)
     const inputLabel = 'Send a message...'
+    const [positionY, positionX] = this.props.position.split(' ')
 
     return (
       <div id="safesupport">
-        <div className="docked-widget" role="complementary">
+        <div className={`docked-widget size-${this.props.size}`} role="complementary" style={{ [positionY]: '10px', [positionX]: '10px' }}>
           <Transition in={opened} timeout={250} onExited={this.handleWidgetExit} onEntered={this.handleWidgetEnter}>
             {(status) => {
               return (
-              <div className={`widget widget-${status}`} aria-hidden={!opened}>
+              <div className={`widget widget-${status} position-${positionY}`} aria-hidden={!opened}>
                 <div id="safesupport-chatbox" aria-haspopup="dialog">
                   <Header handleToggleOpen={this.handleToggleOpen} opened={opened} handleExitChat={this.handleExitChat} />
 
@@ -736,7 +739,7 @@ class ChatBox extends React.Component {
               )}
             }
           </Transition>
-          {showDock && !roomId && <Dock handleToggleOpen={this.handleToggleOpen} />}
+          {showDock && !roomId && <Dock handleToggleOpen={this.handleToggleOpen} size={this.props.size} />}
           {showDock && roomId && <Header handleToggleOpen={this.handleToggleOpen} opened={opened} handleExitChat={this.handleExitChat} />}
         </div>
       </div>
@@ -758,6 +761,8 @@ ChatBox.propTypes = {
   waitMessage: PropTypes.string,
   chatOfflineMessage: PropTypes.string,
   isEncryptionDisabled: PropTypes.bool,
+  position: PropTypes.oneOf(['top left', 'top right', 'bottom left', 'bottom right']),
+  size: PropTypes.oneOf(['small', 'large'])
 }
 
 ChatBox.defaultProps = {
@@ -773,7 +778,9 @@ ChatBox.defaultProps = {
   chatUnavailableMessage: DEFAULT_CHAT_UNAVAILABLE_MESSAGE,
   waitMessage: DEFAULT_WAIT_MESSAGE,
   chatOfflineMessage: DEFAULT_CHAT_OFFLINE_MESSAGE,
-  isEncryptionDisabled: DEFAULT_ENCRYPTION_DISABLED
+  isEncryptionDisabled: DEFAULT_ENCRYPTION_DISABLED,
+  position: DEFAULT_POSITION,
+  size: DEFAULT_SIZE,
 }
 
 export default ChatBox;
