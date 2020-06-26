@@ -13,8 +13,8 @@
     <script src="./chatbox.js"></script>
     <script>
       var config = {
-        matrixServerUrl: 'https://matrix.safesupport.chat',
-        botId: '@help-bot:safesupport.chat',
+        matrixServerUrl: 'https://matrix.rhok.space',
+        botId: '@help-bot:rhok.space',
         roomName: 'Support Chat',
         termsUrl: 'https://tosdr.org/',
         introMessage: "This chat application does not collect any of your personal data or any data from your use of this service.",
@@ -23,6 +23,9 @@
         exitMessage: 'The chat is closed. You may close this window.',
         chatUnavailableMessage: 'The chat service is not available right now. Please try again later.',
         anonymousDisplayName: 'Anonymous',
+        position: 'bottom right',
+        size: 'large',
+        maxWaitTime: 6000*3,
     }
 
       EmbeddableChatbox.mount(config);

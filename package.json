@@ -5,6 +5,7 @@
   "main": "dist/chatbox.js",
   "scripts": {
     "build": "NODE_ENV=production webpack-cli --mode production",
+    "build:profile": "webpack --mode production --config webpack.config.profile.js",
     "start": "webpack-dev-server",
     "test": "jest",
     "test-update-snapshots": "jest --updateSnapshot",
@@ -121,7 +122,7 @@
     "style-loader": "1.1.2",
     "wait-for-expect": "^3.0.2",
     "webpack": "4.41.5",
-    "webpack-bundle-analyzer": "^3.7.0",
+    "webpack-bundle-analyzer": "^3.8.0",
     "webpack-cli": "3.3.10",
     "webpack-dev-server": "3.10.1",
     "webpack-obfuscator": "0.22.0",
