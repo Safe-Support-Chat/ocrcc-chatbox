@@ -24,7 +24,6 @@ const ENCRYPTION_CONFIG = { "algorithm": "m.megolm.v1.aes-sha2" };
 const ENCRYPTION_NOTICE = "Messages in this chat are secured with end-to-end encryption."
 const UNENCRYPTION_NOTICE = "Messages in this chat are not encrypted."
 const RESTARTING_UNENCRYPTED_CHAT_MESSAGE = "Restarting chat without encryption."
-const WAIT_TIME_MS = 120000 // 2 minutes
 const CHAT_IS_OFFLINE_NOTICE = "CHAT_OFFLINE"
 
 const DEFAULT_MATRIX_SERVER = "https://matrix.rhok.space/"
@@ -42,6 +41,8 @@ const DEFAULT_WAIT_MESSAGE = "Please be patient, our online facilitators are cur
 const DEFAULT_ENCRYPTION_DISABLED = false
 const DEFAULT_POSITION = 'bottom right'
 const DEFAULT_SIZE = 'large'
+const DEFAULT_MAX_WAIT_MS = 600000 // 10 minutes
+const DEFAULT_WAIT_INTERVAL_MS = 120000 // 2 minutes
 
 
 class ChatBox extends React.Component {
@@ -470,7 +471,7 @@ class ChatBox extends React.Component {
           body: this.props.chatOfflineMessage
         }
       }
-      this.handleChatOffline(event.getRoomId())
+      this.handleChatOffline()
     }
 
     this.setState({
@@ -482,9 +483,10 @@ class ChatBox extends React.Component {
     })
   }
 
-  handleChatOffline = (roomId) => {
+  handleChatOffline = () => {
     this.exitChat(false) // close the chat connection but keep chatbox state
-    window.clearInterval(this.state.timeoutId) // no more waiting messages
+    window.clearInterval(this.state.waitIntervalId) // no more waiting messages
+    window.clearInterval(this.state.waitTimeoutId) // no more waiting messages
     this.setState({ ready: true }) // no more loading animation
   }
 
@@ -526,7 +528,8 @@ class ChatBox extends React.Component {
       if (eventType === "m.room.member" && content.membership === "join" && sender !== this.props.botId && sender !== this.state.userId) {
         this.verifyAllRoomDevices(client, room)
         this.setState({ facilitatorId: sender, ready: true })
-        window.clearInterval(this.state.timeoutId)
+        window.clearInterval(this.state.waitIntervalId)
+        window.clearInterval(this.state.waitTimeoutId)
       }
     });
 
@@ -598,13 +601,20 @@ class ChatBox extends React.Component {
   }
 
   startWaitTimeForFacilitator = () => {
-    const timeoutId = window.setInterval(() => {
+    const waitIntervalId = window.setInterval(() => {
       if (!this.state.facilitatorId && !this.state.ready) {
         this.displayBotMessage({ body: this.props.waitMessage })
       }
-    }, WAIT_TIME_MS)
+    }, this.props.waitInterval)
 
-    this.setState({ timeoutId })
+    const waitTimeoutId = window.setTimeout(() => {
+      if (!this.state.facilitatorId && !this.state.ready) {
+        this.displayBotMessage({ body: this.props.chatUnavailableMessage })
+        this.handleChatOffline()
+      }
+    }, this.props.maxWaitTime)
+
+    this.setState({ waitIntervalId, waitTimeoutId })
   }
 
   handleRejectTerms = () => {
@@ -762,7 +772,9 @@ ChatBox.propTypes = {
   chatOfflineMessage: PropTypes.string,
   isEncryptionDisabled: PropTypes.bool,
   position: PropTypes.oneOf(['top left', 'top right', 'bottom left', 'bottom right']),
-  size: PropTypes.oneOf(['small', 'large'])
+  size: PropTypes.oneOf(['small', 'large']),
+  maxWaitTime: PropTypes.number,
+  waitInterval: PropTypes.number,
 }
 
 ChatBox.defaultProps = {
@@ -781,6 +793,8 @@ ChatBox.defaultProps = {
   isEncryptionDisabled: DEFAULT_ENCRYPTION_DISABLED,
   position: DEFAULT_POSITION,
   size: DEFAULT_SIZE,
+  maxWaitTime: DEFAULT_MAX_WAIT_MS,
+  waitInterval: DEFAULT_WAIT_INTERVAL_MS,
 }
 
 export default ChatBox;
