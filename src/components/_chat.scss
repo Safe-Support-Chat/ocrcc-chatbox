@@ -571,6 +571,16 @@
 }
 
 @media screen and (max-width: 420px){
+  .docked-widget  {
+    .dock {
+      justify-content: flex-end;
+    }
+
+    #open-chatbox-label {
+      flex: 0 1 auto;
+    }
+  }
+
   .docked-widget {
     right: 0;
     left: 0;
