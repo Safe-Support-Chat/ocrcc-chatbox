@@ -1,6 +1,6 @@
 {
   "name": "private-safesupport-chatbox",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "A secure and private embeddable chatbox that connects to Riot",
   "main": "dist/chatbox.js",
   "scripts": {
