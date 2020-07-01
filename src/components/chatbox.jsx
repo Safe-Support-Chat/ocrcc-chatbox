@@ -232,12 +232,6 @@ class ChatBox extends React.Component {
     this.setState({ ready: false })
 
     const client = await this.createClientWithAccount()
-    this.setState({
-      client: client
-    })
-    client.setDisplayName(this.props.anonymousDisplayName)
-    this.setMatrixListeners(client)
-
     try {
       await client.initCrypto()
     } catch(err) {
@@ -245,7 +239,15 @@ class ChatBox extends React.Component {
     }
 
     await client.startClient()
-    await this.createRoom(client)
+
+    client.once('sync', async (state, prevState, data) => {
+      if (state === "PREPARED") {
+        this.setState({ client })
+        client.setDisplayName(this.props.anonymousDisplayName)
+        this.setMatrixListeners(client)
+        await this.createRoom(client)
+      }
+    })
   }
 
   restartWithoutCrypto = async () => {
@@ -277,35 +279,35 @@ class ChatBox extends React.Component {
 
     let client;
     client = matrix.createClient(opts)
-    this.setState({
-      client: client,
-    })
+    await client.startClient()
 
-    try {
-      this.setMatrixListeners(client)
-      client.setDisplayName(this.props.anonymousDisplayName)
-      await this.createRoom(client)
-      await client.startClient()
-      this.displayBotMessage({ body: UNENCRYPTION_NOTICE })
-    } catch(err) {
-      console.log("error", err)
-      this.handleInitError(err)
-    }
+    client.once('sync', async (state, prevState, data) => {
+      if (state === "PREPARED") {
+        try {
+          this.setState({ client })
+          client.setDisplayName(this.props.anonymousDisplayName)
+          this.setMatrixListeners(client)
+          await this.createRoom(client)
+          this.displayBotMessage({ body: UNENCRYPTION_NOTICE })
+        } catch(err) {
+          console.log("error", err)
+          this.handleInitError(err)
+        }
+      }
+    })
   }
 
 
   initializeUnencryptedChat = async () => {
     this.setState({ ready: false })
-
     const client = await this.createClientWithAccount()
-    this.setState({
-      client: client
-    })
-    client.setDisplayName(this.props.anonymousDisplayName)
-    this.setMatrixListeners(client)
-
     await client.startClient()
-    await this.createRoom(client)
+
+    client.once('sync', async (state, prevState, data) => {
+      client.setDisplayName(this.props.anonymousDisplayName)
+      this.setMatrixListeners(client)
+      await this.createRoom(client)
+    })
   }
 
   handleInitError = (err) => {
@@ -504,6 +506,21 @@ class ChatBox extends React.Component {
   }
 
   setMatrixListeners = client => {
+    client.on("sync", (state, prevState, data) => {
+      switch (state) {
+        case "ERROR":
+          // update UI to say "Connection Lost"
+          break;
+        case "SYNCING":
+          // update UI to remove any "Connection Lost" message
+          break;
+        case "PREPARED":
+          // the client instance is ready to be queried.
+          this.setState({ client: client })
+          break;
+      }
+    });
+
     client.on("Room.timeline", (event, room) => {
       const eventType = event.getType()
       const content = event.getContent()
