@@ -170,7 +170,9 @@ class ChatBox extends React.Component {
       window.clearInterval(this.state.waitIntervalId) // no more waiting messages
     }
 
-    this.state.localStorage.clear()
+    if (this.state.localStorage) {
+      this.state.localStorage.clear()
+    }
 
     if (resetState) {
       this.setState(this.initialState)
