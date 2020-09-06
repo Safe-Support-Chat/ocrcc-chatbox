@@ -115,9 +115,7 @@ describe('Chatbox', () => {
     expect(createClient).toHaveBeenCalled()
     expect(mockInitCrypto).toHaveBeenCalled()
     expect(mockStartClient).toHaveBeenCalled()
-    expect(mockCreateRoom).toHaveBeenCalled()
-    expect(mockSetPowerLevel).toHaveBeenCalled()
-    expect(mockOn).toHaveBeenCalled()
+    expect(mockOnce).toHaveBeenCalled()
   })
 
   test('rejecting terms should not start chat', async () => {
@@ -147,6 +145,10 @@ describe('Chatbox', () => {
     acceptButton.simulate('click')
 
     await waitForExpect(() => {
+      expect(mockOnce).toHaveBeenCalled()
+    });
+
+    await waitForExpect(() => {
       expect(mockCreateRoom).toHaveBeenCalled()
     });
 
@@ -169,7 +171,7 @@ describe('Chatbox', () => {
   })
 
 
-  test('decryption failure should lead to a new unencrypted chat', async () => {
+  test('decryption failure should handle the message event and save the event ID in state', async () => {
     const chatbox = mount(<Chatbox {...testConfig} />)
     const dock = chatbox.find('button.dock')
     const instance = chatbox.instance()
@@ -183,25 +185,25 @@ describe('Chatbox', () => {
     acceptButton.simulate('click')
 
     await waitForExpect(() => {
-      expect(mockCreateRoom).toHaveBeenCalled()
+      expect(mockOnce).toHaveBeenCalled()
     });
 
-    jest.spyOn(instance, 'initializeUnencryptedChat')
-    instance.handleDecryptionError()
+    jest.spyOn(instance, 'handleMessageEvent')
+
+    instance.handleDecryptionError({
+      getId: () => 'test_event_id',
+      getType: () => 'm.message',
+      getSender: () => 'sender',
+      getRoomId: () => 'room id',
+      getContent: () => ({ body: 'test msg' }),
+      getTs: () => '123',
+    })
 
     await waitForExpect(() => {
-      expect(mockLeave).toHaveBeenCalled()
-    });
+      expect(instance.handleMessageEvent).toHaveBeenCalled()
+    })
 
-    await waitForExpect(() => {
-      expect(mockStopClient).toHaveBeenCalled()
-    });
-
-    await waitForExpect(() => {
-      expect(mockClearStores).toHaveBeenCalled()
-    });
-
-    expect(instance.initializeUnencryptedChat).toHaveBeenCalled()
+    expect(chatbox.state().decryptionErrors).toEqual({ 'test_event_id': true })
   })
 
   test('creating an unencrypted chat', async () => {

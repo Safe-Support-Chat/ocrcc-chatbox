@@ -24,7 +24,13 @@ export const mockInitCrypto = jest.fn()
 export const mockStartClient = jest.fn(() => {
   return Promise.resolve('value');
 });
-export const mockOnce = jest.fn()
+export const mockOnce = jest
+  .fn()
+  .mockImplementation((event, callback) => {
+    if (event === 'sync') {
+      callback('PREPARED')
+    }
+  })
 export const mockStopClient = jest.fn(() => {
   return Promise.resolve('value');
 });
