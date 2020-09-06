@@ -167,6 +167,7 @@ class ChatBox extends React.Component {
       await this.state.client.stopClient()
       await this.state.client.clearStores()
       this.setState({ client: null })
+      window.clearInterval(this.state.waitIntervalId) // no more waiting messages
     }
 
     this.state.localStorage.clear()
@@ -487,8 +488,6 @@ class ChatBox extends React.Component {
 
   handleChatOffline = () => {
     this.exitChat(false) // close the chat connection but keep chatbox state
-    window.clearInterval(this.state.waitIntervalId) // no more waiting messages
-    window.clearInterval(this.state.waitTimeoutId) // no more waiting messages
     this.setState({ ready: true }) // no more loading animation
   }
 
@@ -546,7 +545,6 @@ class ChatBox extends React.Component {
         this.verifyAllRoomDevices(client, room)
         this.setState({ facilitatorId: sender, ready: true })
         window.clearInterval(this.state.waitIntervalId)
-        window.clearInterval(this.state.waitTimeoutId)
       }
     });
 
@@ -568,6 +566,23 @@ class ChatBox extends React.Component {
         this.setState({ typingStatus: null })
       }
     });
+
+    client.on("event", (event) => {
+      const eventType = event.getType()
+      const content = event.getContent()
+
+      if (eventType === 'm.bot.signal') {
+        this.handleBotSignal(content.signal)
+      }
+    })
+  }
+
+  handleBotSignal = (signal) => {
+    switch (signal) {
+      case 'END_CHAT':
+        this.displayBotMessage({ body: this.props.exitMessage })
+        return this.exitChat(false); // keep chat state
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -624,14 +639,7 @@ class ChatBox extends React.Component {
       }
     }, this.props.waitInterval)
 
-    const waitTimeoutId = window.setTimeout(() => {
-      if (!this.state.facilitatorId && !this.state.ready) {
-        this.displayBotMessage({ body: this.props.chatUnavailableMessage })
-        this.handleChatOffline()
-      }
-    }, this.props.maxWaitTime)
-
-    this.setState({ waitIntervalId, waitTimeoutId })
+    this.setState({ waitIntervalId })
   }
 
   handleRejectTerms = () => {
