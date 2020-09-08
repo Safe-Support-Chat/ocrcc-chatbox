@@ -166,7 +166,7 @@ class ChatBox extends React.Component {
       await this.state.client.deactivateAccount(auth, true)
       await this.state.client.stopClient()
       await this.state.client.clearStores()
-      this.setState({ client: null })
+      this.setState({ client: null, ready: true }) // no more loading animation
       window.clearInterval(this.state.waitIntervalId) // no more waiting messages
     }
 
