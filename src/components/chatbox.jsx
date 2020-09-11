@@ -461,36 +461,13 @@ class ChatBox extends React.Component {
     const decryptionErrors = {...this.state.decryptionErrors}
     delete decryptionErrors[message.id]
 
-    const isOfflineNotice = message.content.msgtype === "m.notice" && message.content.body === CHAT_IS_OFFLINE_NOTICE
-
-    let newMessage = message
-
-    // when the bot sends a notice that the chat is offline
-    // replace the message with the client-configured message
-    // for now we're treating m.notice and m.text messages the same
-    if (isOfflineNotice) {
-      newMessage = {
-        ...message,
-        content: {
-          ...message.content,
-          body: this.props.chatOfflineMessage
-        }
-      }
-      this.handleChatOffline()
-    }
-
     this.setState({
       messages: {
         ...this.state.messages,
-        [message.id]: newMessage,
+        [message.id]: message,
       },
       decryptionErrors
     })
-  }
-
-  handleChatOffline = () => {
-    this.exitChat(false) // close the chat connection but keep chatbox state
-    this.setState({ ready: true }) // no more loading animation
   }
 
   handleKeyDown = (e) => {
@@ -583,6 +560,9 @@ class ChatBox extends React.Component {
     switch (signal) {
       case 'END_CHAT':
         this.displayBotMessage({ body: this.props.exitMessage })
+        return this.exitChat(false); // keep chat state
+      case 'CHAT_OFFLINE':
+        this.displayBotMessage({ body: this.props.chatOfflineMessage })
         return this.exitChat(false); // keep chat state
     }
   }
