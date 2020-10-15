@@ -94,4 +94,15 @@ module.exports = [{
     publicPath: '/',
     filename: 'bookmarklet.js',
   },
+}, {
+  ...defaultConfig,
+  entry: './src/outputs/component.js',
+  output: {
+    path: distDir,
+    publicPath: '/',
+    filename: 'component.js',
+    library: 'Chatbox',
+    libraryExport: 'default',
+    libraryTarget: 'commonjs2',
+  },
 }];
