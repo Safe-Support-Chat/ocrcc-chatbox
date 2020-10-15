@@ -2,7 +2,7 @@
   "name": "private-safesupport-chatbox",
   "version": "2.1.0",
   "description": "A secure and private embeddable chatbox that connects to Riot",
-  "main": "dist/chatbox.js",
+  "main": "dist/component.js",
   "scripts": {
     "build": "NODE_ENV=production webpack-cli --mode production",
     "build:profile": "webpack --mode production --config webpack.config.profile.js",
@@ -118,6 +118,8 @@
     "node-sass": "^4.13.1",
     "postcss-increase-specificity": "0.6.0",
     "postcss-loader": "3.0.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
     "sass-loader": "8.0.0",
     "style-loader": "1.1.2",
     "wait-for-expect": "^3.0.2",
@@ -137,11 +139,13 @@
     "node-localstorage": "^2.1.5",
     "olm": "https://packages.matrix.org/npm/olm/olm-3.1.4.tgz",
     "prop-types": "^15.6.2",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
     "react-onclickoutside": "^6.9.0",
     "react-test-renderer": "^16.13.0",
     "react-transition-group": "^4.0.0",
     "uuidv4": "^6.0.2"
+  },
+  "peerDependencies": {
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6"
   }
 }
