@@ -1,7 +1,7 @@
 import React, { Fragment } from "react"
 import PropTypes from "prop-types"
 
-const Dock = ({ handleToggleOpen, size }) => {
+const Dock = ({ handleToggleOpen, size, label }) => {
   return(
     <button
       type="button"
@@ -13,11 +13,11 @@ const Dock = ({ handleToggleOpen, size }) => {
       {
         size === 'small' ?
           <div id="open-chatbox-label">
-            <span>Chat</span><span className="icon">+</span>
+            <span>{label}</span><span className="icon">+</span>
           </div>
         :
         <Fragment>
-          <div id="open-chatbox-label">Start a new chat</div>
+          <div id="open-chatbox-label">{label}</div>
           <div className="label-icon">
             <div className={`btn-icon`} aria-label={`Open support chat window`}>+</div>
           </div>

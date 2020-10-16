@@ -43,7 +43,7 @@ const DEFAULT_POSITION = 'bottom right'
 const DEFAULT_SIZE = 'large'
 const DEFAULT_MAX_WAIT_MS = 600000 // 10 minutes
 const DEFAULT_WAIT_INTERVAL_MS = 120000 // 2 minutes
-
+const DEFAULT_DOCK_LABEL = 'Start a new chat'
 
 class ChatBox extends React.Component {
   constructor(props) {
@@ -756,7 +756,7 @@ class ChatBox extends React.Component {
               )}
             }
           </Transition>
-          {showDock && !roomId && <Dock handleToggleOpen={this.handleToggleOpen} size={this.props.size} />}
+          {showDock && !roomId && <Dock handleToggleOpen={this.handleToggleOpen} size={this.props.size} label={this.props.dockLabel} />}
           {showDock && roomId && <Header handleToggleOpen={this.handleToggleOpen} opened={opened} handleExitChat={this.handleExitChat} />}
         </div>
       </div>
@@ -782,6 +782,7 @@ ChatBox.propTypes = {
   size: PropTypes.oneOf(['small', 'large']),
   maxWaitTime: PropTypes.number,
   waitInterval: PropTypes.number,
+  dockLabel: PropTypes.string,
 }
 
 ChatBox.defaultProps = {
@@ -802,6 +803,7 @@ ChatBox.defaultProps = {
   size: DEFAULT_SIZE,
   maxWaitTime: DEFAULT_MAX_WAIT_MS,
   waitInterval: DEFAULT_WAIT_INTERVAL_MS,
+  dockLabel: DEFAULT_DOCK_LABEL,
 }
 
 export default ChatBox;
