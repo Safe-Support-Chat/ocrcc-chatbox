@@ -1,13 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Chatbox from '../components/chatbox';
+import ChatboxWithSettings from '../components/ChatboxWithSettings';
 import '../../vendor/cleanslate.css';
 
 export default class EmbeddableChatbox {
   static el;
 
   static mount({ parentElement = null, ...props } = {}) {
-    const component = <Chatbox {...props} />; // eslint-disable-line
+    const component = <ChatboxWithSettings {...props} />; // eslint-disable-line
+
 
     function doRender() {
       if (EmbeddableChatbox.el) {
