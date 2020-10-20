@@ -13,10 +13,7 @@
     <script src="./chatbox.js"></script>
     <script>
       var config = {
-        matrixServerUrl: 'https://matrix.safesupport.chat',
-        airtableApiKey: 'keyFfDHgHILw5IIwA',
-        airtableBaseId: 'app7IycwU6dY6o1oj',
-        settingsTableName: 'settings',
+        settingsEndpoint: 'https://safesupport-admin.herokuapp.com/api/get-settings'
       }
 
       EmbeddableChatbox.mount(config);

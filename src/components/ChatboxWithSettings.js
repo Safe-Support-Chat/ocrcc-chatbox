@@ -10,7 +10,12 @@ const ChatboxWithSettings = ({ settingsEndpoint, ...rest }) => {
 
   const getSettings = async () => {
     if (!settingsEndpoint) {
-      return null;
+      const props = {
+        ...rest,
+        enabled: true
+      }
+
+      return setSettings(props);
     }
 
     const res = await fetch(settingsEndpoint);
@@ -25,7 +30,9 @@ const ChatboxWithSettings = ({ settingsEndpoint, ...rest }) => {
       }
     });
 
-    console.log("settings", settingsObj)
+    if (!settingsObj.enabled) {
+      settingsObj.enabled = false;
+    }
 
     return setSettings(settingsObj);
   };

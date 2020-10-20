@@ -44,6 +44,7 @@ const DEFAULT_SIZE = 'large'
 const DEFAULT_MAX_WAIT_MS = 600000 // 10 minutes
 const DEFAULT_WAIT_INTERVAL_MS = 120000 // 2 minutes
 const DEFAULT_DOCK_LABEL = 'Start a new chat'
+const DEFAULT_ENABLED = false
 
 class ChatBox extends React.Component {
   constructor(props) {
@@ -68,7 +69,7 @@ class ChatBox extends React.Component {
       isMobile: true,
       isSlowConnection: true,
       decryptionErrors: {},
-      messagesInFlight: []
+      messagesInFlight: [],
     }
     this.state = this.initialState
     this.chatboxInput = React.createRef();
@@ -654,6 +655,10 @@ class ChatBox extends React.Component {
   }
 
   render() {
+    if (!this.props.enabled) {
+      return null
+    }
+
     const { ready, messages, messagesInFlight, inputValue, userId, roomId, typingStatus, opened, showDock, emojiSelectorOpen, isMobile, decryptionErrors } = this.state;
     const orderedMessages = Object.values(messages).sort((a,b) => a.timestamp - b.timestamp)
     const inputLabel = 'Send a message...'
@@ -783,6 +788,7 @@ ChatBox.propTypes = {
   maxWaitTime: PropTypes.number,
   waitInterval: PropTypes.number,
   dockLabel: PropTypes.string,
+  enabled: PropTypes.bool,
 }
 
 ChatBox.defaultProps = {
@@ -804,6 +810,7 @@ ChatBox.defaultProps = {
   maxWaitTime: DEFAULT_MAX_WAIT_MS,
   waitInterval: DEFAULT_WAIT_INTERVAL_MS,
   dockLabel: DEFAULT_DOCK_LABEL,
+  enabled: DEFAULT_ENABLED,
 }
 
 export default ChatBox;
