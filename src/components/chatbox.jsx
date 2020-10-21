@@ -34,7 +34,7 @@ const DEFAULT_INTRO_MESSAGE = "This chat application does not collect any of you
 const DEFAULT_AGREEMENT_MESSAGE = "Do you want to continue?"
 const DEFAULT_CONFIRMATION_MESSAGE = "Waiting for a facilitator to join the chat..."
 const DEFAULT_EXIT_MESSAGE = "The chat is closed. You may close this window."
-const DEFAULT_ANONYMOUS_DISPLAY_NAME="Anonymous"
+const DEFAULT_DISPLAY_NAME="Anonymous"
 const DEFAULT_CHAT_UNAVAILABLE_MESSAGE = "The chat service is not available right now. Please try again later."
 const DEFAULT_CHAT_OFFLINE_MESSAGE = "All of the chat facilitators are currently offline."
 const DEFAULT_WAIT_MESSAGE = "Please be patient, our online facilitators are currently responding to other support requests."
@@ -247,7 +247,7 @@ class ChatBox extends React.Component {
     client.once('sync', async (state, prevState, data) => {
       if (state === "PREPARED") {
         this.setState({ client })
-        client.setDisplayName(this.props.anonymousDisplayName)
+        client.setDisplayName(this.props.displayName)
         this.setMatrixListeners(client)
         await this.createRoom(client)
       }
@@ -289,7 +289,7 @@ class ChatBox extends React.Component {
       if (state === "PREPARED") {
         try {
           this.setState({ client })
-          client.setDisplayName(this.props.anonymousDisplayName)
+          client.setDisplayName(this.props.displayName)
           this.setMatrixListeners(client)
           await this.createRoom(client)
           this.displayBotMessage({ body: UNENCRYPTION_NOTICE })
@@ -308,7 +308,7 @@ class ChatBox extends React.Component {
     await client.startClient()
 
     client.once('sync', async (state, prevState, data) => {
-      client.setDisplayName(this.props.anonymousDisplayName)
+      client.setDisplayName(this.props.displayName)
       this.setMatrixListeners(client)
       await this.createRoom(client)
     })
@@ -779,7 +779,7 @@ ChatBox.propTypes = {
   confirmationMessage: PropTypes.string,
   exitMessage: PropTypes.string,
   chatUnavailableMessage: PropTypes.string,
-  anonymousDisplayName: PropTypes.string,
+  displayName: PropTypes.string,
   waitMessage: PropTypes.string,
   chatOfflineMessage: PropTypes.string,
   isEncryptionDisabled: PropTypes.bool,
@@ -800,7 +800,7 @@ ChatBox.defaultProps = {
   agreementMessage: DEFAULT_AGREEMENT_MESSAGE,
   confirmationMessage: DEFAULT_CONFIRMATION_MESSAGE,
   exitMessage: DEFAULT_EXIT_MESSAGE,
-  anonymousDisplayName: DEFAULT_ANONYMOUS_DISPLAY_NAME,
+  displayName: DEFAULT_DISPLAY_NAME,
   chatUnavailableMessage: DEFAULT_CHAT_UNAVAILABLE_MESSAGE,
   waitMessage: DEFAULT_WAIT_MESSAGE,
   chatOfflineMessage: DEFAULT_CHAT_OFFLINE_MESSAGE,
