@@ -3,22 +3,22 @@ import PropTypes from 'prop-types';
 import Chatbox from './chatbox';
 
 
-const ChatboxWithSettings = ({ settingsEndpoint, ...rest }) => {
+const ChatboxWithSettings = ({ settingsEndpoint, matrixServerUrl, ...rest }) => {
   const [settings, setSettings] = useState({});
-
   const settingsObj = {};
 
   const getSettings = async () => {
     if (!settingsEndpoint) {
       const props = {
         ...rest,
-        enabled: true
-      }
+        enabled: true,
+      };
 
       return setSettings(props);
     }
 
-    const res = await fetch(settingsEndpoint);
+    const url = `${settingsEndpoint}?homeserver=${encodeURIComponent(matrixServerUrl)}`;
+    const res = await fetch(url);
     const data = await res.json();
     const { fields } = data;
 
@@ -42,12 +42,17 @@ const ChatboxWithSettings = ({ settingsEndpoint, ...rest }) => {
   }, []);
 
   return (
-    <Chatbox {...settings} {...rest} />
+    <Chatbox matrixServerUrl={matrixServerUrl} {...settings} {...rest} />
   );
 };
 
 ChatboxWithSettings.propTypes = {
+  matrixServerUrl: PropTypes.string.isRequired,
   settingsEndpoint: PropTypes.string,
+};
+
+ChatboxWithSettings.defaultProps = {
+  settingsEndpoint: null,
 };
 
 export default ChatboxWithSettings;
