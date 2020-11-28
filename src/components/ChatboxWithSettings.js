@@ -5,6 +5,8 @@ import Chatbox from './chatbox';
 
 const ChatboxWithSettings = ({ settingsEndpoint, matrixServerUrl, ...rest }) => {
   const [settings, setSettings] = useState({});
+  const [shifts, setShifts] = useState();
+  const [isAvailable, setAvailability] = useState(false);
   const settingsObj = {};
 
   const getSettings = async () => {
@@ -12,6 +14,7 @@ const ChatboxWithSettings = ({ settingsEndpoint, matrixServerUrl, ...rest }) => 
       const props = {
         ...rest,
         enabled: true,
+        isAvailable: true,
       };
 
       return setSettings(props);
@@ -20,7 +23,9 @@ const ChatboxWithSettings = ({ settingsEndpoint, matrixServerUrl, ...rest }) => 
     const url = `${settingsEndpoint}?homeserver=${encodeURIComponent(matrixServerUrl)}`;
     const res = await fetch(url);
     const data = await res.json();
-    const { fields } = data;
+    const { fields, schedule = [] } = data;
+
+    setShifts(schedule);
 
     Object.entries(fields).forEach(([k, v]) => {
       const [scope, key] = k.split('_');
@@ -37,12 +42,45 @@ const ChatboxWithSettings = ({ settingsEndpoint, matrixServerUrl, ...rest }) => 
     return setSettings(settingsObj);
   };
 
+  const checkSchedule = () => {
+    if (shifts.length === 0) {
+      setAvailability(true);
+    }
+
+    const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+    const now = new Date();
+    const weekday = weekdays[now.getDay()];
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+
+    shifts.map(async (shift) => {
+      const [startHours, startMinutes] = shift.start.split(':').map((t) => Number(t));
+      const [endHours, endMinutes] = shift.end.split(':').map((t) => Number(t));
+      if (
+        shift.service === 'web'
+        && shift.weekday === weekday
+        && ((startHours < hours) || (startHours === hours && startMinutes <= minutes))
+        && ((endHours > hours) || (endHours === hours && endMinutes > minutes))
+      ) {
+        setAvailability(true);
+      }
+    });
+  };
+
   useEffect(() => {
     getSettings();
   }, []);
 
+  useEffect(() => {
+    if (shifts) {
+      checkSchedule();
+    }
+  }, [shifts]);
+
   return (
-    <Chatbox matrixServerUrl={matrixServerUrl} {...settings} {...rest} />
+    /* eslint-disable react/jsx-props-no-spreading */
+    <Chatbox matrixServerUrl={matrixServerUrl} isAvailable={isAvailable} {...settings} {...rest} />
   );
 };
 

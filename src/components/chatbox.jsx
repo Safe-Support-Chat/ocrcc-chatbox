@@ -69,7 +69,7 @@ class ChatBox extends React.Component {
       isMobile: true,
       isSlowConnection: true,
       decryptionErrors: {},
-      messagesInFlight: [],
+      messagesInFlight: []
     }
     this.state = this.initialState
     this.chatboxInput = React.createRef();
@@ -587,14 +587,14 @@ class ChatBox extends React.Component {
   }
 
   componentDidMount() {
-    document.addEventListener("keydown", this.handleKeyDown, false);
+    document.addEventListener("keydown", this.handleKeyDown, false)
     window.addEventListener('beforeunload', this.exitChat)
   }
 
   componentWillUnmount() {
-    document.removeEventListener("keydown", this.handleKeyDown, false);
+    document.removeEventListener("keydown", this.handleKeyDown, false)
     window.removeEventListener('beforeunload', this.exitChat)
-    this.exitChat();
+    this.exitChat()
   }
 
   handleInputChange = e => {
@@ -655,7 +655,7 @@ class ChatBox extends React.Component {
   }
 
   render() {
-    if (!this.props.enabled) {
+    if (!this.props.enabled || !this.props.isAvailable) {
       return null
     }
 
@@ -788,7 +788,7 @@ ChatBox.propTypes = {
   maxWaitTime: PropTypes.number,
   waitInterval: PropTypes.number,
   dockLabel: PropTypes.string,
-  enabled: PropTypes.bool,
+  enabled: PropTypes.bool
 }
 
 ChatBox.defaultProps = {
