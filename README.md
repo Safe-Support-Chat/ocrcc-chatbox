@@ -45,7 +45,6 @@ Options:
 | `chatOfflineMessage` (optional) | Text to show if there is no-one online respond | `All of the chat facilitators are currently offline.` |
 | `size` (optional) | The size of the start button. Can be 'small' or 'large' | `large` |
 | `position` (optional) | The position of the start button. Can be 'top left', 'top right', 'bottom left', 'bottom right'. | `bottom right` |
-| `maxWaitTime` (optional) | The maximum time (in ms) the chatbox will wait for someone to join before closing the chat and displaying the chat unavailable message | 600000 |
 | `waitInterval` (optional) | The interval (in ms) at which the bot sends the wait message | 120000 |
 
 

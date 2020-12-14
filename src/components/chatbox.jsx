@@ -41,7 +41,6 @@ const DEFAULT_WAIT_MESSAGE = "Please be patient, our online facilitators are cur
 const DEFAULT_ENCRYPTION_DISABLED = false
 const DEFAULT_POSITION = 'bottom right'
 const DEFAULT_SIZE = 'large'
-const DEFAULT_MAX_WAIT_MS = 600000 // 10 minutes
 const DEFAULT_WAIT_INTERVAL_MS = 120000 // 2 minutes
 const DEFAULT_DOCK_LABEL = 'Start a new chat'
 const DEFAULT_ENABLED = false
@@ -785,7 +784,6 @@ ChatBox.propTypes = {
   isEncryptionDisabled: PropTypes.bool,
   position: PropTypes.oneOf(['top left', 'top right', 'bottom left', 'bottom right']),
   size: PropTypes.oneOf(['small', 'large']),
-  maxWaitTime: PropTypes.number,
   waitInterval: PropTypes.number,
   dockLabel: PropTypes.string,
   enabled: PropTypes.bool
@@ -807,7 +805,6 @@ ChatBox.defaultProps = {
   isEncryptionDisabled: DEFAULT_ENCRYPTION_DISABLED,
   position: DEFAULT_POSITION,
   size: DEFAULT_SIZE,
-  maxWaitTime: DEFAULT_MAX_WAIT_MS,
   waitInterval: DEFAULT_WAIT_INTERVAL_MS,
   dockLabel: DEFAULT_DOCK_LABEL,
   enabled: DEFAULT_ENABLED,

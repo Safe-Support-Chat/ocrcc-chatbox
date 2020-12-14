@@ -7,7 +7,6 @@ const ChatboxWithSettings = ({ settingsEndpoint, matrixServerUrl, ...rest }) => 
   const [settings, setSettings] = useState({});
   const [shifts, setShifts] = useState();
   const [isAvailable, setAvailability] = useState(false);
-  const settingsObj = {};
 
   const getSettings = async () => {
     if (!settingsEndpoint) {
@@ -24,6 +23,7 @@ const ChatboxWithSettings = ({ settingsEndpoint, matrixServerUrl, ...rest }) => 
     const res = await fetch(url);
     const data = await res.json();
     const { fields, schedule = [] } = data;
+    const settingsObj = {};
 
     setShifts(schedule);
 
