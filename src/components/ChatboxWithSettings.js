@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Chatbox from './chatbox';
+import { DEFAULT_SETTINGS_ENDPOINT } from '../utils/constants';
 
-
-const ChatboxWithSettings = ({ settingsEndpoint, matrixServerUrl, ...rest }) => {
+const ChatboxWithSettings = ({ settingsEndpoint = null, matrixServerUrl, ...rest }) => {
   const [settings, setSettings] = useState({});
   const [shifts, setShifts] = useState();
   const [isAvailable, setAvailability] = useState(false);
 
   const getSettings = async () => {
-    if (!settingsEndpoint) {
+    const endpoint = settingsEndpoint || DEFAULT_SETTINGS_ENDPOINT;
+    const url = `${endpoint}?homeserver=${encodeURIComponent(matrixServerUrl)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const { fields, schedule = [] } = data;
+
+    if (!fields) {
       const props = {
         ...rest,
         enabled: true,
@@ -19,10 +25,6 @@ const ChatboxWithSettings = ({ settingsEndpoint, matrixServerUrl, ...rest }) => 
       return setSettings(props);
     }
 
-    const url = `${settingsEndpoint}?homeserver=${encodeURIComponent(matrixServerUrl)}`;
-    const res = await fetch(url);
-    const data = await res.json();
-    const { fields, schedule = [] } = data;
     const settingsObj = {};
 
     setShifts(schedule);
