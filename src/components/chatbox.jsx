@@ -151,23 +151,28 @@ class ChatBox extends React.Component {
 
   exitChat = async (resetState=true) => {
     if (this.state.client) {
-      await this.state.client.leave(this.state.roomId)
+      try {
+        await this.state.client.leave(this.state.roomId)
 
-      const auth = {
-        type: 'm.login.password',
-        user: this.state.userId,
-        identifier: {
-            type: "m.id.user",
-            user: this.state.userId,
-        },
-        password: this.state.password,
-      };
+        const auth = {
+          type: 'm.login.password',
+          user: this.state.userId,
+          identifier: {
+              type: "m.id.user",
+              user: this.state.userId,
+          },
+          password: this.state.password,
+        };
 
-      await this.state.client.deactivateAccount(auth, true)
-      await this.state.client.stopClient()
-      await this.state.client.clearStores()
-      this.setState({ client: null, ready: true }) // no more loading animation
-      window.clearInterval(this.state.waitIntervalId) // no more waiting messages
+        await this.state.client.deactivateAccount(auth, true)
+        await this.state.client.stopClient()
+        await this.state.client.clearStores()
+      } catch (err) {
+        console.log("Error exiting chat", err)
+      } finally {
+        this.setState({ client: null, ready: true }) // no more loading animation
+        window.clearInterval(this.state.waitIntervalId) // no more waiting messages
+      }
     }
 
     if (this.state.localStorage) {
