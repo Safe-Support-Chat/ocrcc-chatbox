@@ -86,11 +86,11 @@ You can try this out on the [live demo](https://nomadic-labs.github.io/safesuppo
 
 Clone the project:
 ```
-git clone https://github.com/nomadic-labs/safesupport-chatbox.git
+git clone https://github.com/Safe-Support-Chat/ocrcc-chatbox.git
 ```
 Install the dependencies:
 ```
-cd safesupport-chatbox
+cd ocrcc-chatbox
 yarn
 ```
 
