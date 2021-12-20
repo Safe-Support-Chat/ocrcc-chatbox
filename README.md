@@ -74,7 +74,7 @@ This chatbox is meant to be used with a bot account that handles a number of fun
 
 The bot account is invited to the chatroom when a support request is initiated.
 
-You can find the code for the bot at [safesupport-bot](https://github.com/nomadic-labs/safesupport-bot).
+You can find the code for the bot at [ocrcc-bot](https://github.com/Safe-Support-Labs/ocrcc-bot).
 
 ## Bookmarklet
 
