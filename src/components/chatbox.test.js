@@ -27,8 +27,8 @@ import waitForExpect from 'wait-for-expect'
 config.disabled = true
 
 var testConfig = {
-  matrixServerUrl: 'https://matrix.rhok.space',
-  botId: '@help-bot:rhok.space',
+  matrixServerUrl: 'https://test.matrix.tld',
+  botId: '@help-bot:matrix.tld',
   roomName: 'Support Chat',
   termsUrl: 'https://tosdr.org/',
   introMessage: 'This chat application does not collect any of your personal data or any data from your use of this service.',

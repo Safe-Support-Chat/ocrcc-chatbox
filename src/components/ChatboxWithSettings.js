@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Chatbox from './chatbox';
-import { DEFAULT_SETTINGS_ENDPOINT } from '../utils/constants';
 
 const ChatboxWithSettings = ({ settingsEndpoint = null, matrixServerUrl, ...rest }) => {
   const [settings, setSettings] = useState({});
   const [shifts, setShifts] = useState();
-  const [isAvailable, setAvailability] = useState(false);
+  const [isAvailable, setAvailability] = useState(true);
 
   const getSettings = async () => {
-    const endpoint = settingsEndpoint || DEFAULT_SETTINGS_ENDPOINT;
-    const url = `${endpoint}?homeserver=${encodeURIComponent(matrixServerUrl)}`;
+    const url = `${settingsEndpoint}?homeserver=${encodeURIComponent(matrixServerUrl)}`;
     const res = await fetch(url);
     const data = await res.json();
     const { fields, schedule = [] } = data;
@@ -45,10 +43,6 @@ const ChatboxWithSettings = ({ settingsEndpoint = null, matrixServerUrl, ...rest
   };
 
   const checkSchedule = () => {
-    if (shifts.length === 0) {
-      setAvailability(true);
-    }
-
     const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
     const now = new Date();
@@ -71,11 +65,13 @@ const ChatboxWithSettings = ({ settingsEndpoint = null, matrixServerUrl, ...rest
   };
 
   useEffect(() => {
-    getSettings();
-  }, []);
+    if (settingsEndpoint) {
+      getSettings();
+    }
+  }, [settingsEndpoint]);
 
   useEffect(() => {
-    if (shifts) {
+    if (shifts && shifts.length > 0) {
       checkSchedule();
     }
   }, [shifts]);

@@ -10,7 +10,7 @@ Built on:
 
 ## Usage
 ```
-<script src="https://unpkg.com/private-safesupport-chatbox" type="text/javascript"></script>
+<script src="https://safesupport.chat/chatbox.js" type="text/javascript"></script>
 <script>
   var config = {
     matrixServerUrl: 'https://matrix-client.matrix.org',
@@ -74,7 +74,7 @@ This chatbox is meant to be used with a bot account that handles a number of fun
 
 The bot account is invited to the chatroom when a support request is initiated.
 
-You can find the code for the bot at [ocrcc-bot](https://github.com/Safe-Support-Labs/ocrcc-bot).
+You can find the code for the bot at [ocrcc-bot](https://github.com/Safe-Support-Chat/ocrcc-bot).
 
 ## Bookmarklet
 
